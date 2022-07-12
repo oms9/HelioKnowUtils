@@ -24,7 +24,7 @@ def analyzeBib(paperCode):
     else:
         return False
 
-def analyzeAbs(paperAbstract, paperTitle, wordsList, threshHold):
+def analyzeTxt(paperAbstract, paperTitle, wordsList, threshHold):
     '''Function to analyze the abstract of a paper'''
     global paperCount
     matches = {}
@@ -34,8 +34,8 @@ def analyzeAbs(paperAbstract, paperTitle, wordsList, threshHold):
 
     #Phrase matching
     for word in wordsList:
-        if word in paperAbstract or el in paperTitle:
-            LOG.debug("Matched '{}' in paper# {}'s abstract.".format(word, paperCount))
+        if word in paperAbstract or word in paperTitle:
+            LOG.debug("Matched phrase '{}' in paper# {}".format(word, paperCount))
             if word not in matches:
                 matches[word] = 1
             else:
@@ -91,16 +91,17 @@ def isAcronym(inWord):
     capCount = 0
 
     if inWord.isupper():
-        return true
+        return True
         
     for letter in inWord:
         if letter.isupper():
             capCount += 1
             
     if ((capCount / len(inWord)) * 100) >= 50:
-        return true
-        
-    return false
+        LOG.debug("Word {} detected as acronym".format(inWord))
+        return True
+    
+    return False
 
 
 def savePaper(match, outFile):
@@ -194,7 +195,7 @@ if __name__ == '__main__':
         for paper in docs['docs']:
             try:
                 #LOG.debug("Loaded paper: {}".format(str(paperCount)))
-                if analyzeBib(paper['bibcode']) and analyzeAbs(paper['abstract'], paper['title'][len(paper['title'])-1], terms, args.wordCount):
+                if analyzeBib(paper['bibcode']) and analyzeTxt(paper['abstract'], paper['title'][len(paper['title'])-1], terms, args.wordCount):
                     savePaper(paper, out)
                     matchCount += 1
                     
@@ -221,7 +222,7 @@ if __name__ == '__main__':
         for paper in docs['docs']:
             try:
                 #LOG.debug("Loaded paper: {}".format(str(paperCount)))
-                if analyzeBib(paper['bibcode']) or analyzeAbs(paper['abstract'], paper['title'][0], terms, args.wordCount):
+                if analyzeBib(paper['bibcode']) or analyzeTxt(paper['abstract'], paper['title'][0], terms, args.wordCount):
                     savePaper(paper, out)
                     matchCount += 1
                     
