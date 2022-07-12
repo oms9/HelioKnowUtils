@@ -33,6 +33,10 @@ def analyzeAbs(paperAbstract, paperTitle, wordsList, threshHold):
     titleList = (paperTitle.lower()).split()
     #Abstract matching
     for word in abstractList:
+    #Skip Acronyms
+        if word.isupper():
+            continue
+            
         if word in wordsList:
             LOG.debug("Matched '{}' in paper# {}'s abstract.".format(word, paperCount))
             if word not in matches:
