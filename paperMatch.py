@@ -29,33 +29,52 @@ def analyzeAbs(paperAbstract, paperTitle, wordsList, threshHold):
     global paperCount
     matches = {}
     totalMatches = 0
-    abstractList = (paperAbstract.lower()).split()
-    titleList = (paperTitle.lower()).split()
-    #Abstract matching
-    for word in abstractList:
-        
-    #Skip Acronyms
-        if word.isupper():
-            continue  
-        if word in wordsList:
+    abstractList = paperAbstract.split()
+    titleList = paperTitle.split()
+
+    #Phrase matching
+    for word in wordsList:
+        if word in paperAbstract or el in paperTitle:
             LOG.debug("Matched '{}' in paper# {}'s abstract.".format(word, paperCount))
             if word not in matches:
                 matches[word] = 1
             else:
                 matches[word] += 1
 
-    #Title matching
-    for word in titleList:
-        
-    #Skip Acronyms
-        if word.isupper():
-            continue  
-        if word in wordsList:
-            LOG.debug("Matched '{}' in paper# {}'s title.".format(word, paperCount))
-            if word not in matches:
-                matches[word] = 1
+
+    #Abstract matching
+    for glossaryWord in wordsList:
+        for abstractWord in abstractList:
+            #Skip Acronyms
+            if isAcronym(abstractWord):
+                continue
             else:
-                matches[word] += 1
+                abstractWord = abstractWord.lower()
+            
+            if glossaryWord in abstractWord:
+                LOG.debug("Matched '{}' in paper# {}'s abstract.".format(glossaryWord, paperCount))
+                if glossaryWord not in matches:
+                    matches[glossaryWord] = 1
+                else:
+                    matches[glossaryWord] += 1
+
+
+    #Title matching
+    for glossaryWord in wordsList:
+        for titleWord in titleList:
+            #Skip Acronyms
+            if isAcronym(titleWord):
+                continue
+            else:
+                titleWord = titleWord.lower()
+            
+            if glossaryWord in titleWord:
+                LOG.debug("Matched '{}' in paper# {}'s title.".format(glossaryWord, paperCount))
+                if glossaryWord not in matches:
+                    matches[glossaryWord] = 1
+                else:
+                    matches[glossaryWord] += 1
+
 
     #Tally matches and final decision
     for el in matches:
@@ -67,6 +86,23 @@ def analyzeAbs(paperAbstract, paperTitle, wordsList, threshHold):
 
     return False
 
+
+def isAcronym(inWord):
+    capCount = 0
+
+    if inWord.isupper():
+        return true
+        
+    for letter in inWord:
+        if letter.isupper():
+            capCount += 1
+            
+    if ((capCount / len(inWord)) * 100) >= 50:
+        return true
+        
+    return false
+
+
 def savePaper(match, outFile):
     '''This function will dump a single paper to a specified JSON file'''
     global paperCount
@@ -77,6 +113,7 @@ def savePaper(match, outFile):
         return 1
     except:
         return -1
+
 
 if __name__ == '__main__': 
 

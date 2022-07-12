@@ -98,17 +98,6 @@ for paper in adsPapers['response']['docs']:
 
 citeRank = sortDict(citeRank)
 
-'''
-#Testing
-with open("AAA.txt", 'w', encoding="utf-8") as out:
-    out.write("-=============== [CiteRank] ===============-\n")
-    for el in citeRank:
-        out.write(str(el) + ": " + str(citeRank[el]) + "\n")
-    out.write("-=============== [CiteLink] ===============-\n")
-    for el in citeLinks:
-        out.write(str(el) + ": " + str(citeLinks[el]) + "\n")
-'''
-
 #Adding the papers as nodes to the graph, with the #of cites as an attribute.
 for paper in citeRank:
     graph.add_node(str(paper), weight=citeRank[paper], size = citeRank[paper])
