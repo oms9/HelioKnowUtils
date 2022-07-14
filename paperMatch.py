@@ -2,9 +2,11 @@ import re
 import sys
 import csv
 import json
+import spacy
 import logging
 import argparse
 
+sp = spacy.load('en_core_web_sm')
 LOG = logging.getLogger('HelioMatch')
 logging.basicConfig(level=logging.INFO)
 
@@ -29,10 +31,12 @@ def analyzeTxt(paperAbstract, paperTitle, wordsList, threshHold):
     global paperCount
     matches = {}
     totalMatches = 0
-    abstractList = paperAbstract.split()
-    titleList = paperTitle.split()
-
+    abs = sp(paperAbstract)
+    tit = sp(paperTitle)
+    
+    '''
     #Phrase matching
+    
     for word in wordsList:
         if word in paperAbstract or word in paperTitle:
             LOG.debug("Matched phrase '{}' in paper# {}".format(word, paperCount))
@@ -40,40 +44,33 @@ def analyzeTxt(paperAbstract, paperTitle, wordsList, threshHold):
                 matches[word] = 1
             else:
                 matches[word] += 1
-
+    '''
 
     #Abstract matching
-    for glossaryWord in wordsList:
-        for abstractWord in abstractList:
-            #Skip Acronyms
-            if isAcronym(abstractWord):
-                continue
-            else:
-                abstractWord = abstractWord.lower()
-            
-            if glossaryWord in abstractWord:
-                LOG.debug("Matched '{}' in paper# {}'s abstract.".format(glossaryWord, paperCount))
-                if glossaryWord not in matches:
-                    matches[glossaryWord] = 1
+    for word in abs:
+        if isAcronym(word.text):
+            continue
+        else:
+            word = word.lemma_
+            if word in wordsList:
+                LOG.debug("Matched '{}' in paper# {}'s abstract.".format(word, paperCount))
+                if word not in matches:
+                    matches[word] = 1
                 else:
-                    matches[glossaryWord] += 1
-
+                    matches[word] += 1
 
     #Title matching
-    for glossaryWord in wordsList:
-        for titleWord in titleList:
-            #Skip Acronyms
-            if isAcronym(titleWord):
-                continue
-            else:
-                titleWord = titleWord.lower()
-            
-            if glossaryWord in titleWord:
-                LOG.debug("Matched '{}' in paper# {}'s title.".format(glossaryWord, paperCount))
-                if glossaryWord not in matches:
-                    matches[glossaryWord] = 1
+    for word in tit:
+        if isAcronym(word.text):
+            continue
+        else:
+            word = word.lemma_
+            if word in wordsList:
+                LOG.debug("Matched '{}' in paper# {}'s Title.".format(word, paperCount))
+                if word not in matches:
+                    matches[word] = 1
                 else:
-                    matches[glossaryWord] += 1
+                    matches[word] += 1
 
 
     #Tally matches and final decision
@@ -188,7 +185,11 @@ if __name__ == '__main__':
             termFile.readline()
             terms = []
             for a, b, c in csv.reader(termFile, delimiter = ','):
+               # a = sp(a)
+                #a = a.lemma_
+                #print(a)
                 terms.append(a)
+                
         #Analyze papers.
         print("\nAnalyzing papers:")
         paperCount = 1

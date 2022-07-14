@@ -75,7 +75,7 @@ req = requests.post("https://api.adsabs.harvard.edu/v1/search/bigquery",
 
 
 adsPapers = json.loads(req.content.decode('utf-8'))
-del neededCites
+#del neededCites
 
 #Level 1 citation analysis     
 print("Accesssing fetched ADS papers.")
@@ -106,10 +106,94 @@ for paper in citeLinks:
     for cite in citeLinks[paper]:
         graph.add_edge(paper, cite)
 
+
+degCent = nx.degree_centrality(graph)
+subCent = nx.subgraph_centrality(graph)
+betCent = nx.betweenness_centrality(graph)
+
+with open("Degree Centrality.txt", "w", encoding="utf-8") as statFile:
+    statFile.write("|==============[ Degree Centrality ]==============|\n")
+    for node in degCent:
+        statFile.write(str(node) + ": " + str(degCent[node]) + '\n')
+        
+with open("Subgraph Centrality.txt", "w", encoding="utf-8") as statFile:
+    statFile.write("|==============[ Subgraph Centrality ]==============|\n")
+    for node in subCent:
+        statFile.write(str(node) + ": " + str(subCent[node]) + '\n')
+
+with open("Betweenness Centrality.txt", "w", encoding="utf-8") as statFile:
+    statFile.write("|==============[ Betweenness Centrality ]==============|\n")
+    for node in betCent:
+        statFile.write(str(node) + ": " + str(betCent[node]) + '\n')
+        
+paperDeg = {}
+for paper in citeRank:
+    paperDeg[paper] = 0
+    try:
+        paperDeg[paper] += citeRank[paper]
+        paperDeg[paper] += len(citeLinks[paper]) 
+    except(KeyError):
+        pass
+
+paperDeg = sortDict(paperDeg)
+
+with open("Bibcode Degrees.txt", "w", encoding="utf-8") as statFile:
+    statFile.write("|==============[ Bibcode Degrees ]==============|\n")
+    for paper in paperDeg:
+        statFile.write(str(paper) + ": " + str(paperDeg[paper]) + '\n')
+
+degDict = {}
+for bibcode in paperDeg:
+    if paperDeg[bibcode] not in degDict:
+        degDict[paperDeg[bibcode]] = 1
+    else:
+        degDict[paperDeg[bibcode]] += 1
+    
+#degDict = sortDict(degDict)
+with open("Degree Distribution.txt", "w", encoding="utf-8") as statFile:
+    statFile.write("|==============[ Degree Distribution ]==============|\n")
+    for paper in degDict:
+        statFile.write(str(paper) + ": " + str(degDict[paper]) + '\n')
+
+#Plotting centrality
+fig, (ax1,ax2,ax3) = plt.subplots(1, 3)
+cenX = []
+degY = []
+
+betY = []
+subY = []
+
+for point in citeRank:
+    cenX.append(citeRank[point])
+    degY.append(degCent[point])
+
+for point in citeRank:
+    betY.append(betCent[point])
+
+for point in citeRank:
+    subY.append(subCent[point])    
+
+ax1.bar(x = cenX, height = degY, color = 'r')
+ax1.set_xlabel('Num. of Citations')
+ax1.set_title('Degree Centrality')
+
+ax2.bar(x = cenX, height = betY, color = 'b')
+ax2.set_xlabel('Num. of Citations')
+ax2.set_title('Betweenness Centrality')
+
+ax3.bar(x = cenX, height = subY, color = 'm')
+ax3.set_xlabel('Num. of Citations')
+ax3.set_title('Subgraph Centrality')
+
+plt.show()
+
+fig, ax4 = plt.subplots()
+ax4.bar(range(len(degDict)), list(degDict.values()), tick_label = list(degDict.keys()))
+ax4.set_title("Degree distribution")
+
+plt.show()
+              
 nx.draw(graph)
 plt.show()
 
 print("Done!")
-
-
-
