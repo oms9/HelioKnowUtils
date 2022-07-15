@@ -2,14 +2,16 @@ import re
 import sys
 import csv
 import json
-import spacy
+#import spacy
 import logging
 import argparse
-
-sp = spacy.load('en_core_web_sm')
+#sp = spacy.load('en_core_web_sm')
 LOG = logging.getLogger('HelioMatch')
 logging.basicConfig(level=logging.INFO)
+from nltk.stem import WordNetLemmatizer
 
+lemm = WordNetLemmatizer()
+#lemm.lemmatize(word)
 def analyzeBib(paperCode):
     '''Function to analyze the bibcode of a paper'''
     biblist = ['SpWea','GeoRL','JGR','JGRA','JGRE','LRSP','STP','P&SS',
@@ -31,27 +33,30 @@ def analyzeTxt(paperAbstract, paperTitle, wordsList, threshHold):
     global paperCount
     matches = {}
     totalMatches = 0
-    abs = sp(paperAbstract)
-    tit = sp(paperTitle)
-    
-    '''
+    phrase = []
+
     #Phrase matching
-    
     for word in wordsList:
+        if " " in word:
+            for part in word:
+                part = lemm.lemmatize(part)
+                print(word)
+                
+        word = lemm.lemmatize(word)
+
         if word in paperAbstract or word in paperTitle:
             LOG.debug("Matched phrase '{}' in paper# {}".format(word, paperCount))
             if word not in matches:
                 matches[word] = 1
             else:
                 matches[word] += 1
-    '''
-
+    
     #Abstract matching
-    for word in abs:
-        if isAcronym(word.text):
+    for word in paperAbstract:
+        if isAcronym(word):
             continue
         else:
-            word = word.lemma_
+            lemm.lemmatize(word)
             if word in wordsList:
                 LOG.debug("Matched '{}' in paper# {}'s abstract.".format(word, paperCount))
                 if word not in matches:
@@ -60,18 +65,17 @@ def analyzeTxt(paperAbstract, paperTitle, wordsList, threshHold):
                     matches[word] += 1
 
     #Title matching
-    for word in tit:
-        if isAcronym(word.text):
+    for word in paperTitle:
+        if isAcronym(word):
             continue
         else:
-            word = word.lemma_
+            lemm.lemmatize(word)
             if word in wordsList:
                 LOG.debug("Matched '{}' in paper# {}'s Title.".format(word, paperCount))
                 if word not in matches:
                     matches[word] = 1
                 else:
                     matches[word] += 1
-
 
     #Tally matches and final decision
     for el in matches:
@@ -80,7 +84,6 @@ def analyzeTxt(paperAbstract, paperTitle, wordsList, threshHold):
     if totalMatches >= threshHold:
         LOG.debug("Paper word match success for paper#: {}".format(paperCount))
         return True
-
     return False
 
 
@@ -181,7 +184,10 @@ if __name__ == '__main__':
     #   Mode 2 - Bibcode AND abstract   #
     elif args.mode == 2:
         LOG.debug("MODE 2 SELECTED")
-        with open('nonUniqueTerms.csv', 'r') as termFile:
+        with open("HelioGlossary.txt", "r") as termFile:
+            terms = termFile.read().split()
+            
+            '''
             termFile.readline()
             terms = []
             for a, b, c in csv.reader(termFile, delimiter = ','):
@@ -189,7 +195,7 @@ if __name__ == '__main__':
                 #a = a.lemma_
                 #print(a)
                 terms.append(a)
-                
+            ''' 
         #Analyze papers.
         print("\nAnalyzing papers:")
         paperCount = 1
@@ -212,11 +218,18 @@ if __name__ == '__main__':
     #   Mode 3 - Bibcode OR abstract   #
     elif args.mode == 3:
         LOG.debug("MODE 3 SELECTED")
-        with open('nonUniqueTerms.csv', 'r') as termFile:
+        with open("HelioGlossary.txt", "r") as termFile:
+            terms = termFile.read().split()
+            
+            '''
             termFile.readline()
             terms = []
             for a, b, c in csv.reader(termFile, delimiter = ','):
+               # a = sp(a)
+                #a = a.lemma_
+                #print(a)
                 terms.append(a)
+            ''' 
         #Analyze papers.
         print("\nAnalyzing papers:")
         paperCount = 1
