@@ -1,5 +1,6 @@
 import sys
 import json
+import math
 #import logging
 import requests
 #import argparse
@@ -186,10 +187,16 @@ ax3.set_xlabel('Num. of Citations')
 ax3.set_title('Subgraph Centrality')
 
 plt.show()
-
+logX = []
+logY = []
+for el in list(degDict):
+    logX.append(math.log(el,10))
+for el in list(degDict.keys()):
+    logY.append("{:.2f}".format(math.log(el,10)))
+    
 fig, ax4 = plt.subplots()
-ax4.bar(range(len(degDict)), list(degDict.values()), tick_label = list(degDict.keys()))
-ax4.set_title("Degree distribution")
+ax4.bar(range(len(degDict)), logX, tick_label = logY)
+ax4.set_title("Log Log Degree distribution")
 
 plt.show()
               

@@ -1,17 +1,32 @@
+#Omar Shalaby - 7/18/22
+#Imports block
+import os
 import re
 import sys
 import csv
+import nltk
 import json
-#import spacy
 import logging
 import argparse
-#sp = spacy.load('en_core_web_sm')
-LOG = logging.getLogger('HelioMatch')
-logging.basicConfig(level=logging.INFO)
+from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
+#=======================================#
+#Prep tools/variables/folder
 lemm = WordNetLemmatizer()
-#lemm.lemmatize(word)
+LOG = logging.getLogger('HelioMatch')
+logging.basicConfig(level=logging.INFO)
+stopWords = list(stopwords.words('english'))
+punct = "#$%&'()*+,\./:;<=>?@[\\]^_`{|}~]+]*"
+path = os.getcwd()
+path = os.path.join(path, 'Data')
+try:
+    os.mkdir(path)
+except:
+    pass
+#=======================================#
+
+#Function definitions
 def analyzeBib(paperCode):
     '''Function to analyze the bibcode of a paper'''
     biblist = ['SpWea','GeoRL','JGR','JGRA','JGRE','LRSP','STP','P&SS',
@@ -27,56 +42,84 @@ def analyzeBib(paperCode):
         return True
     else:
         return False
+#End of bibcode matching function ==================================|
+
 
 def analyzeTxt(paperAbstract, paperTitle, wordsList, threshHold):
     '''Function to analyze the abstract of a paper'''
+    global punct
+    global stopWords
     global paperCount
+
     matches = {}
     totalMatches = 0
-    phrase = []
+#=======================================#
+    #Removing punctuation from abstract
+    pAbs = paperAbstract
+    for char in pAbs:
+        if char == '-':
+            pAbs = pAbs.replace(char, " ")
+        elif char in punct:
+            pAbs = pAbs.replace(char, '')
+            
+    #Removing stop words from abstract
+    pAbs = pAbs.split()
+    for word in pAbs:
+        if word in stopWords:
+            LOG.debug("Removed: {} from abstract".format(word))
+            pAbs = [keep for keep in pAbs if keep != word]
 
-    #Phrase matching
-    for word in wordsList:
-        if " " in word:
-            for part in word:
-                part = lemm.lemmatize(part)
-                print(word)
-                
-        word = lemm.lemmatize(word)
+    #Lemmatizing abstract
+    for word in pAbs:
+        if not isAcronym(word):
+            word = lemm.lemmatize(word)
+#=======================================#         
+    #Removing punctuation from title
+    pTitle = paperTitle
+    for char in pTitle:
+        if char == '-':
+            pTitle = pTitle.replace(char, " ")
+        elif char in punct:
+            pTitle = pTitle.replace(char, '')
 
-        if word in paperAbstract or word in paperTitle:
-            LOG.debug("Matched phrase '{}' in paper# {}".format(word, paperCount))
-            if word not in matches:
-                matches[word] = 1
-            else:
-                matches[word] += 1
-    
+    #Removing stop words from title
+    pTitle = pTitle.split()
+    for word in pTitle:
+        if word in stopWords:
+            LOG.debug("Removed: {} from title".format(word))
+            pTitle = [keep for keep in pTitle if keep != word]
+     
+    #Lemmatizing title
+    for word in pTitle:
+        if not isAcronym(word):
+            word = lemm.lemmatize(word.lower())
+#=======================================#
     #Abstract matching
-    for word in paperAbstract:
+    for word in pAbs:
         if isAcronym(word):
             continue
-        else:
-            lemm.lemmatize(word)
-            if word in wordsList:
-                LOG.debug("Matched '{}' in paper# {}'s abstract.".format(word, paperCount))
+        
+        for key in terms:
+            if word == key:
+                LOG.debug("Matched '{}' with '{}' in paper# {}'s abstract.".format(word, key, paperCount))
                 if word not in matches:
                     matches[word] = 1
                 else:
                     matches[word] += 1
-
+#=======================================#
     #Title matching
-    for word in paperTitle:
+    for word in pTitle:
         if isAcronym(word):
             continue
-        else:
-            lemm.lemmatize(word)
-            if word in wordsList:
-                LOG.debug("Matched '{}' in paper# {}'s Title.".format(word, paperCount))
+        
+        for key in terms:
+            if word == key:
+                LOG.debug("Matched '{}' with '{}' in paper# {}'s title.".format(word, key, paperCount))
                 if word not in matches:
                     matches[word] = 1
                 else:
                     matches[word] += 1
-
+#=======================================#
     #Tally matches and final decision
     for el in matches:
         totalMatches = totalMatches + matches[el]
@@ -85,9 +128,11 @@ def analyzeTxt(paperAbstract, paperTitle, wordsList, threshHold):
         LOG.debug("Paper word match success for paper#: {}".format(paperCount))
         return True
     return False
+#End of text analysis function =====================================|
 
 
 def isAcronym(inWord):
+    '''Function to identify acronyms, if 50% or more of the character are captilaized, it is an acronym'''
     capCount = 0
 
     if inWord.isupper():
@@ -102,6 +147,7 @@ def isAcronym(inWord):
         return True
     
     return False
+#End of acronym rejection function ===================================|
 
 
 def savePaper(match, outFile):
@@ -114,8 +160,10 @@ def savePaper(match, outFile):
         return 1
     except:
         return -1
+#End of paper save function ===========================================|
 
 
+# ====== [Main] ====== #
 if __name__ == '__main__': 
 
     ap = argparse.ArgumentParser(description='Extracts papers about Heliophysics topics from ADS Data')
@@ -154,7 +202,7 @@ if __name__ == '__main__':
         sys.exit("Data load failed, JSON syntax failure.")
 
     #Preparing output file.
-    out = open("{}.json".format(args.outFile), 'w', encoding="utf-8")
+    out = open("{path}\\{fileName}.json".format(path = path, fileName = args.outFile), 'w', encoding="utf-8")
     out.write('{\n  "Matched_Papers": [\n')
 
 
@@ -166,7 +214,6 @@ if __name__ == '__main__':
         paperCount = 1
         for paper in docs['docs']:
             try:
-                #LOG.debug("Loaded paper: {}".format(str(paperCount)))
                 if analyzeBib(paper['bibcode']):
                     savePaper(paper, out)
                     matchCount += 1
@@ -184,24 +231,32 @@ if __name__ == '__main__':
     #   Mode 2 - Bibcode AND abstract   #
     elif args.mode == 2:
         LOG.debug("MODE 2 SELECTED")
-        with open("HelioGlossary.txt", "r") as termFile:
-            terms = termFile.read().split()
+        
+        with open("HelioGlossary.txt", "r", encoding = "utf-8") as termFile:
+            terms = termFile.read()
             
-            '''
-            termFile.readline()
-            terms = []
-            for a, b, c in csv.reader(termFile, delimiter = ','):
-               # a = sp(a)
-                #a = a.lemma_
-                #print(a)
-                terms.append(a)
-            ''' 
+            #Removing punctuation from terms
+            for char in terms:
+                if char == '-':
+                    terms = terms.replace(char, ' ')      
+                elif char in punct:
+                    terms = terms.replace(char, '')
+            terms  = terms.split()
+    
+            #Removing stop words from terms
+            for word in terms:
+                if word in stopWords:
+                    terms = [keep for keep in terms if keep != word]
+
+            #Lemmatizing terms
+            for word in terms:
+                word = lemm.lemmatize(word)
+
         #Analyze papers.
         print("\nAnalyzing papers:")
         paperCount = 1
         for paper in docs['docs']:
             try:
-                #LOG.debug("Loaded paper: {}".format(str(paperCount)))
                 if analyzeBib(paper['bibcode']) and analyzeTxt(paper['abstract'], paper['title'][len(paper['title'])-1], terms, args.wordCount):
                     savePaper(paper, out)
                     matchCount += 1
@@ -218,25 +273,33 @@ if __name__ == '__main__':
     #   Mode 3 - Bibcode OR abstract   #
     elif args.mode == 3:
         LOG.debug("MODE 3 SELECTED")
-        with open("HelioGlossary.txt", "r") as termFile:
-            terms = termFile.read().split()
+        
+        with open("HelioGlossary.txt", "r", encoding = "utf-8") as termFile:
+            terms = termFile.read()
             
-            '''
-            termFile.readline()
-            terms = []
-            for a, b, c in csv.reader(termFile, delimiter = ','):
-               # a = sp(a)
-                #a = a.lemma_
-                #print(a)
-                terms.append(a)
-            ''' 
+            #Removing punctuation from terms
+            for char in terms:
+                if char == '-':
+                    terms = terms.replace(char, ' ')      
+                elif char in punct:
+                    terms = terms.replace(char, '')
+            terms  = terms.split()
+    
+            #Removing stop words from terms
+            for word in terms:
+                if word in stopWords:
+                    terms = [keep for keep in terms if keep != word]
+
+            #Lemmatizing terms
+            for word in terms:
+                word = lemm.lemmatize(word)
+
         #Analyze papers.
         print("\nAnalyzing papers:")
         paperCount = 1
         for paper in docs['docs']:
             try:
-                #LOG.debug("Loaded paper: {}".format(str(paperCount)))
-                if analyzeBib(paper['bibcode']) or analyzeTxt(paper['abstract'], paper['title'][0], terms, args.wordCount):
+                if analyzeBib(paper['bibcode']) or analyzeTxt(paper['abstract'], paper['title'][len(paper['title'])-1], terms, args.wordCount):
                     savePaper(paper, out)
                     matchCount += 1
                     
@@ -261,3 +324,5 @@ if __name__ == '__main__':
     print("\n\nMatched", matchCount, "papers out of", paperCount - 1)
     print("Number of corrupted papers encountered:", failures)
     sys.exit("\nAll done!\n")
+#End of main function
+    
