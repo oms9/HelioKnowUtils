@@ -1,0 +1,35 @@
+|==============[ Statistics ]==============|
+Total retrieved: 58132
+numFound: 58132
+GeoRL: 17340
+JGRA: 9320
+AdSpR: 5892
+AcAau: 5627
+Ap&SS: 3905
+SoPh: 2542
+P&SS: 2459
+JGRE: 2159
+AdAtS: 1666
+SpWea: 1308
+SSRv: 1306
+E&SS: 1078
+FrASS: 771
+SpReT: 722
+AdAp: 536
+Cmplx: 494
+STP: 292
+AcA: 277
+AASP: 164
+JPCom: 133
+LRSP: 67
+AdGeo: 51
+LRCA: 16
+AdAnS: 6
+ApL: 1
+JGR: 0
+RvGSP: 0
+SLSci: 0
+AdA&A: 0
+ASPRv: 0
+AurPh: 0
+JComp: 0
