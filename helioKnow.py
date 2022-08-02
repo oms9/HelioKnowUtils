@@ -3,8 +3,8 @@
 # Change these fields to use the program
 # Input file must be a .JSON file
 inFile = "W4" 
-adsAPIKey = 'C3iPSUfJpBJAa6rZ2BwzgrxJwnhYmzqTkOAQjtWg'
-iterations = 0
+adsAPIKey = ''
+iterations = 0 #The number of times to traverse the citations chain.
 saveADSData = False #Cache the retrieved ADS papers? (overwrites previous runs)
 saveStats = True #Save the centrality and degree measures of the network graph? (overwrites previous runs)
 #---------------------------------------------------------------------------#

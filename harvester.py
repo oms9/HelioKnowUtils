@@ -3,6 +3,17 @@ import json
 import traceback
 import requests
 
+#Please provide the ADS token.
+token = ''
+
+
+bibList = ['SpWea','GeoRL','JGR','JGRA','JGRE','LRSP','STP','P&SS',
+        'Ap&SS','SoPh','RvGSP','SSRv','AcAau','AcA','SLSci','SpReT',
+        'AdAnS','AdA&A','AASP','AdAp','AdAtS','AdGeo','AdSpR','ASPRv',
+        'AurPh','JComp','JPCom','Cmplx','LRCA','ApL', 'FrASS', 'E&SS']
+
+fileName = 'AllData'
+
 
 def sortDict(inDict):
     '''Function to sort dictionaries based on numerical values of keys'''
@@ -16,20 +27,15 @@ try:
 except:
     pass
 
-bibList = ['SpWea','GeoRL','JGR','JGRA','JGRE','LRSP','STP','P&SS',
-        'Ap&SS','SoPh','RvGSP','SSRv','AcAau','AcA','SLSci','SpReT',
-        'AdAnS','AdA&A','AASP','AdAp','AdAtS','AdGeo','AdSpR','ASPRv',
-        'AurPh','JComp','JPCom','Cmplx','LRCA','ApL', 'FrASS', 'E&SS']
 
-token = 'Ir9y98vfhhErqd0F0uGWFjlJCP36L8noiYvnylF6'
 
 stats = {}
 actual = 0
 totalFound = 0
 totalRetrieved = 0
 papers = {"numFound": totalFound, "docs": []}
-         
-#Send requests.
+
+#Send requests for each bibtree.
 for code in bibList:
     start = 0
     bib = code
@@ -49,7 +55,7 @@ for code in bibList:
             print("Loading JSON failed.")
             traceback.print_exc()
     num = data['response']['numFound']
-
+    #Batching the requests and recieved papers
     while start <= num:
         print("Retrieving {} out of {} papers from {} journal".format(start, num, code))
         url = 'https://api.adsabs.harvard.edu/v1/search/query?q=bibstem%3A{} year%3A2010-2022&fl=bibcode%2Cauthor%2Ctitle%2Ccitation%2Cabstract%2Ckeyword&start={}&rows=200'.format(bib, start)
@@ -75,16 +81,18 @@ for code in bibList:
             print("Query for {} journals failed.".format(code))  
     totalRetrieved = len(papers['docs'])
     totalFound = totalFound + int(data['response']['numFound'])
-    papers["numFound"] = totalFound   
-print("Writing data to file.")
+    papers["numFound"] = totalFound
 
-with open('{path}\\{fileName}.json'.format(path = path, fileName = 'AllData'), "w", encoding = "utf-8") as outFile:
+#Saving the fetched papers to a JSON file  
+print("Writing data to file.")
+with open('{path}\\{fileName}.json'.format(path = path, fileName), "w", encoding = "utf-8") as outFile:
     outFile.write(json.dumps(papers, indent=3, sort_keys = True))
     outFile.write("\n")
     
 stats['numFound'] = totalFound
 stats = sortDict(stats)
 
+#Cache some statistics to disk
 with open('{path}\\{fileName}.txt'.format(path = path, fileName = 'Stats'), "w", encoding = "utf-8") as statFile:
     statFile.write("|==============[ Statistics ]==============|\n")
     statFile.write("Total retrieved: " + str(totalRetrieved) + '\n')

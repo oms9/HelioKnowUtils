@@ -34,7 +34,7 @@ def sortDict(inDict):
 
 
 def analyzeBib(paperCode):
-    '''Function to analyze the bibcode of a paper'''
+    '''Function to analyze the bibcode of a paper to see which bibstem it belongs to, True for Heliophysics related.'''
     biblist = ['SpWea','GeoRL','JGR','JGRA','JGRE','LRSP','STP','P&SS',
             'Ap&SS','SoPh','RvGSP','SSRv','AcAau','AcA','SLSci','SpReT',
             'AdAnS','AdA&A','AASP','AdAp','AdAtS','AdGeo','AdSpR','ASPRv',
@@ -52,14 +52,14 @@ def analyzeBib(paperCode):
 
 
 def analyzeTxt(inPaper, wordsList, threshHold):
-    '''Function to analyze the abstract and title of a paper using a list of keywords'''
+    '''Function to process the abstract and title of a paper using a list of keywords'''
     global punct
     global stopWords
     global paperCount
     matches = {}
     totalMatches = 0 
     terms = wordsList
-    
+
 #==========================#
     # Removing punctuation from abstract
     pAbs = inPaper['abstract']
