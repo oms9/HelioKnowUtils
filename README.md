@@ -105,7 +105,7 @@ Specify whether you want to cache the data retrieved from any traversals by sett
 
 Specify whether to save the statistics/metrics of the generated network by setting the `saveStats` variable to either `True` or `False` 🔸
 
-🔸Be careful because this process will automatically over-write the cache/metrics files.
+🔸Be careful because these two processes will automatically over-write the cache/metrics files if they exist.
 
 You are now free to run the script and patiently await the results!
 
