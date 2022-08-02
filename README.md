@@ -38,7 +38,7 @@ In order to run these scripts you must have the following Python modules/librari
 ## Obtaining an API Key
 
 Getting an API key is fairly simple.
-First create an account at https://ui.adsabs.harvard.edu/ <br>⚠️ **Please note the account requires email verification.** ⚠️
+First create an account at: https://ui.adsabs.harvard.edu/ <br>⚠️ **Please note the account requires email verification.** ⚠️
 After login, you can generate an API key here: https://ui.adsabs.harvard.edu/user/settings/token
 
 ## Match keys/terms
@@ -70,7 +70,7 @@ Open the file `harvester.py` and paste your API key into the `token` variable an
     SpWea GeoRL JGR JGRA JGRE LRSP STP P&SS 
     Ap&SS SoPh RvGSP SSRv AcAau AcA SLSci SpReT 
     AdAnS AdA&A AASP AdAp AdAtS AdGeo AdSpR ASPRv 
-    AurPh JComp JPCom Cmplx LRCA ApL  FrASS  E&SS
+    AurPh JComp JPCom Cmplx LRCA ApL FrASS E&SS
 Lastly, provide the output file name by modifying the variable `fileName`
 
 You can now run the script and it will download all the papers found from the years 2010 to 2022 and save the result.
