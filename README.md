@@ -101,9 +101,9 @@ Specify the number of iterations by modifying the `iterations` variable. 🔹
 ##### Iterations are the number of traversal the script should perform, A traversal is simply going up the citations chain 1 time, so if you have a source 	paper `A` that has been cited by paper `B`, and you want to know what papers cited paper `B` (and therefore being somewhat related to paper `A`), you have to traverse the chain of citations `1 time`.
 🔹There is a limit of 20,000 papers per day that can be requested from ADS on a standard API key.
 
-then specify whether you want to cache the data retrieved from any traversals by setting the `saveADSData` variable to either `True` or `False` 🔸
+Specify whether you want to cache the data retrieved from any traversals by setting the `saveADSData` variable to either `True` or `False` 🔸
 
-afterwards, specify whether to save the statistics/metrics of the generated network by setting the `saveStats` variable to either `True` or `False` 🔸
+Specify whether to save the statistics/metrics of the generated network by setting the `saveStats` variable to either `True` or `False` 🔸
 
 🔸Be careful because this process will automatically over-write the cache/metrics files.
 
