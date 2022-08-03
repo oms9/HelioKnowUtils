@@ -38,7 +38,7 @@ In order to run these scripts you must have the following Python modules/librari
 ## Obtaining an API Key
 
 Getting an API key is fairly simple.
-First create an account at https://ui.adsabs.harvard.edu/ <br>⚠️ **Please note the account requires email verification.** ⚠️
+First create an account at: https://ui.adsabs.harvard.edu/ <br>⚠️ **Please note the account requires email verification.** ⚠️
 After login, you can generate an API key here: https://ui.adsabs.harvard.edu/user/settings/token
 
 ## Match keys/terms
@@ -70,7 +70,7 @@ Open the file `harvester.py` and paste your API key into the `token` variable an
     SpWea GeoRL JGR JGRA JGRE LRSP STP P&SS 
     Ap&SS SoPh RvGSP SSRv AcAau AcA SLSci SpReT 
     AdAnS AdA&A AASP AdAp AdAtS AdGeo AdSpR ASPRv 
-    AurPh JComp JPCom Cmplx LRCA ApL  FrASS  E&SS
+    AurPh JComp JPCom Cmplx LRCA ApL FrASS E&SS
 Lastly, provide the output file name by modifying the variable `fileName`
 
 You can now run the script and it will download all the papers found from the years 2010 to 2022 and save the result.
@@ -101,11 +101,11 @@ Specify the number of iterations by modifying the `iterations` variable. 🔹
 ##### Iterations are the number of traversal the script should perform, A traversal is simply going up the citations chain 1 time, so if you have a source 	paper `A` that has been cited by paper `B`, and you want to know what papers cited paper `B` (and therefore being somewhat related to paper `A`), you have to traverse the chain of citations `1 time`.
 🔹There is a limit of 20,000 papers per day that can be requested from ADS on a standard API key.
 
-then specify whether you want to cache the data retrieved from any traversals by setting the `saveADSData` variable to either `True` or `False` 🔸
+Specify whether you want to cache the data retrieved from any traversals by setting the `saveADSData` variable to either `True` or `False` 🔸
 
-afterwards, specify whether to save the statistics/metrics of the generated network by setting the `saveStats` variable to either `True` or `False` 🔸
+Specify whether to save the statistics/metrics of the generated network by setting the `saveStats` variable to either `True` or `False` 🔸
 
-🔸Be careful because this process will automatically over-write the cache/metrics files.
+🔸Be careful because these two processes will automatically over-write the cache/metrics files if they exist.
 
 You are now free to run the script and patiently await the results!
 
