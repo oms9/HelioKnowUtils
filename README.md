@@ -1,21 +1,21 @@
-# HelioKnow Utils
+# LitNetworkBuilder
 A contribution to the heliophysics KNOWledge Network (Helio-Know), Natural Language Processing and Knowledge Graphs of Heliophysics research.
 
 ## Introduction
 The Helio-Know knowledge network is all about Natural Language Processing (NLP) and Knowledge Graphs about the literature in the field of Heliophysics. It aims to provide useful insight into the works published in the Heliophysics field. Constructing knowledge graphs can be difficult because human based tagging of papers was found to be inaccurate and often under-represents the value and content of the literature. There were also many other problems when processing the documents, like missing abstracts or multi-lingual titles when pulling a large body of documents and some text processing challenges like handling hyphen joined words, acronyms and punctuation, and matching plural to singular words.
 
 
-Hence the creation of HelioKnow Utils, a collection of tools aimed at solving the aforementioned problems and easing the road to creating networks of HelioPhysics literature.
+Hence the creation of LitNetworkBuilder, a collection of tools aimed at solving the aforementioned problems and easing the road to creating networks of HelioPhysics literature.
 
 These tools are (in expected order of operation):
 
  1. harvester.py  -  A script to pull a large body of papers from the Astrophysics Data System (ADS).
  2. paperMatch.py  -  A script to filter the papers, keeping the Heliophysics related papers in a new file.
- 3. helioKnow.py  -  A script to create the network from the papers and pull metrics and stats from the generated network.
+ 3. networkBuilder.py  -  A script to create the network from the papers and pull metrics and stats from the generated network.
 
 # Getting Started
 Before you start building networks and performing research, you must do the following:
- - Clone the repository: `git clone https://github.com/oms9/HelioKnowUtils`
+ - Clone the repository: `git clone https://github.com/oms9/LitNetworkBuilder`
  - Install the dependencies and download the necessary sub-modules.
  - Obtain an API key to use the ADS API.
  - Prepare a list of Heliophysics related terms, keywords or phrases to match papers against.
@@ -92,9 +92,9 @@ An example run command should look something like this:
     python paperMatch.py -i AllData.json -o W4Matches -w 4 -m 2
 	
 	
-## helioKnow
+## networkBuilder
 
-Open the file `helioKnow.py`, specify the input file by modifying the `inFile` variable.
+Open the file `networkBuilder.py`, specify the input file by modifying the `inFile` variable.
 Paste your API key into the `adsAPIKey` variable.
 Specify the number of iterations by modifying the `iterations` variable. 🔹
 
