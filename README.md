@@ -1,4 +1,4 @@
-# LitNetworkBuilder
+# LitNetworkBuilder [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1tMJ7YLOz0bfjQUAcQCVNS56BnDWVBB2E)
 A contribution to the heliophysics KNOWledge Network (Helio-Know), Natural Language Processing and Knowledge Graphs of Heliophysics research.
 
 ## Introduction
